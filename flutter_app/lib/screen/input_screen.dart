@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/db/db_helper.dart';
 import 'package:flutter_app/model/product_model.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class InputScreen extends StatefulWidget {
   @override
@@ -12,6 +16,9 @@ class _InputScreenState extends State<InputScreen> {
   final _deskripsiController = TextEditingController();
   final _gambarController = TextEditingController();
   final _hargaController = TextEditingController();
+
+  File? _pickedImage;
+  final ImagePicker _picker = ImagePicker();
   
   final List<String> _kategoriList = ['Makanan', 'Elektronik', 'Buku dan ATK', 'Fashion', 'Lainnya'];
   String _selectedKategori = 'Lainnya';
@@ -19,7 +26,7 @@ class _InputScreenState extends State<InputScreen> {
   void _simpanProduk() async {
     if (_namaController.text.isEmpty ||
         _deskripsiController.text.isEmpty ||
-        _gambarController.text.isEmpty ||
+        _pickedImage?.path == null ||
         _hargaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua field harus diisi')),
@@ -30,7 +37,7 @@ class _InputScreenState extends State<InputScreen> {
       nama: _namaController.text,
       deskripsi: _deskripsiController.text,
       kategori: _selectedKategori,
-      gambar: _gambarController.text,
+      gambar: _pickedImage!.path,
       harga: _hargaController.text,
     );
 
@@ -80,18 +87,28 @@ class _InputScreenState extends State<InputScreen> {
               validator: (value) => value == 'empty' ? 'Pilih kategori' : null,
             ),
             TextField(
-              controller: _gambarController,
-              decoration: const InputDecoration(
-                labelText: 'Gambar',
-              ),
-            ),
-            TextField(
               controller: _hargaController,
               decoration: const InputDecoration(
                 labelText: 'Harga',
               ),
               keyboardType: TextInputType.number,
             ),
+            SizedBox(height: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _pickedImage != null
+                ? Image.file(
+                    _pickedImage!,
+                    height: 200,
+                  )
+                : const Text('Belum ada gambar'),
+                ],
+            ),
+            ElevatedButton(
+              onPressed: _pickImage, 
+              child: Text('Upload Gambar')
+              ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -113,4 +130,14 @@ class _InputScreenState extends State<InputScreen> {
       ),
     );
   }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    setState(() {
+      _pickedImage = File(pickedFile.path);
+    });
+  }
+}
 }

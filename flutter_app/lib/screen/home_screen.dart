@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_app/screen/edit_screen.dart';
 import '../db/db_helper.dart';
@@ -69,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: data.length,
               itemBuilder: (context, index) {
                 final prodct = data[index];
+                print(prodct.gambar);
                 return Card(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -77,7 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         children: [
-                          const Icon(Icons.ads_click),
+                          File(prodct.gambar).existsSync()
+                          ? Image.file(
+                              File(prodct.gambar),
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
+                            )
+                          : const Icon(Icons.image),
                           const SizedBox(width: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 prodct.nama,
                                 style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              Text(prodct.deskripsi),
+                              Text(
+                                prodct.deskripsi
+                                ),
                             ],
                           ),
                           const Spacer(),
