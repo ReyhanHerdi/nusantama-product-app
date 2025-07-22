@@ -14,7 +14,6 @@ class InputScreen extends StatefulWidget {
 class _InputScreenState extends State<InputScreen> {
   final _namaController = TextEditingController();
   final _deskripsiController = TextEditingController();
-  final _gambarController = TextEditingController();
   final _hargaController = TextEditingController();
 
   File? _pickedImage;
@@ -103,12 +102,12 @@ class _InputScreenState extends State<InputScreen> {
                     height: 200,
                   )
                 : const Text('Belum ada gambar'),
+                ElevatedButton(
+                  onPressed: _pickImage, 
+                  child: Text('Upload Gambar')
+                  ),
                 ],
             ),
-            ElevatedButton(
-              onPressed: _pickImage, 
-              child: Text('Upload Gambar')
-              ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,

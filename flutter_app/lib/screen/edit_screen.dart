@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../db/db_helper.dart';
 import '../model/product_model.dart';
 
@@ -21,14 +24,19 @@ class _EditScreenState extends State<EditScreen> {
   final List<String> _kategoriList = ['Makanan', 'Elektronik', 'Buku dan ATK', 'Fashion', 'Lainnya'];
     String _selectedKategori = 'Lainnya';
 
+  File? _pickedImage;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
     namaController = TextEditingController(text: widget.product.nama);
     deskripsiController = TextEditingController(text: widget.product.deskripsi);
-    gambarController = TextEditingController(text: widget.product.gambar);
     hargaController = TextEditingController(text: widget.product.harga);
     _selectedKategori = widget.product.kategori;
+    _pickedImage = widget.product.gambar.isNotEmpty
+      ? File(widget.product.gambar)
+      : null;
     }
 
   @override
@@ -67,13 +75,25 @@ class _EditScreenState extends State<EditScreen> {
               validator: (value) => value == 'empty' ? 'Pilih kategori' : null,
             ),
             TextField(
-              controller: gambarController,
-              decoration: const InputDecoration(labelText: 'Gambar'),
-            ),
-            TextField(
               controller: hargaController,
               decoration: const InputDecoration(labelText: 'Harga'),
               keyboardType: TextInputType.text,
+            ),
+            SizedBox(height: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _pickedImage != null
+                ? Image.file(
+                    _pickedImage!,
+                    height: 200,
+                  )
+                : const Text('Belum ada gambar'),
+                ElevatedButton(
+                  onPressed: _pickImage, 
+                  child: Text('Upload Gambar')
+                  ),
+                ],
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -100,7 +120,7 @@ class _EditScreenState extends State<EditScreen> {
       nama: namaController.text,
       deskripsi: deskripsiController.text,
       kategori: _selectedKategori,
-      gambar: gambarController.text,
+      gambar: _pickedImage!.path,
       harga: hargaController.text,
     );
 
@@ -108,4 +128,14 @@ class _EditScreenState extends State<EditScreen> {
 
     if (context.mounted) Navigator.pop(context, true);
   }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    setState(() {
+      _pickedImage = File(pickedFile.path);
+    });
+  }
+}
 }
