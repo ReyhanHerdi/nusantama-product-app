@@ -18,15 +18,18 @@ class _EditScreenState extends State<EditScreen> {
   late TextEditingController gambarController;
   late TextEditingController hargaController;
 
+  final List<String> _kategoriList = ['Makanan', 'Elektronik', 'Buku dan ATK', 'Fashion', 'Lainnya'];
+    String _selectedKategori = 'Lainnya';
+
   @override
   void initState() {
     super.initState();
     namaController = TextEditingController(text: widget.product.nama);
     deskripsiController = TextEditingController(text: widget.product.deskripsi);
-    kategoriController = TextEditingController(text: widget.product.kategori);
     gambarController = TextEditingController(text: widget.product.gambar);
     hargaController = TextEditingController(text: widget.product.harga);
-  }
+    _selectedKategori = widget.product.kategori;
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +47,24 @@ class _EditScreenState extends State<EditScreen> {
               controller: deskripsiController,
               decoration: const InputDecoration(labelText: 'Deskripsi'),
             ),
-            TextField(
-              controller: kategoriController,
-              decoration: const InputDecoration(labelText: 'Kategori'),
+            DropdownButtonFormField<String>(
+              value: _selectedKategori,
+              decoration: const InputDecoration(
+                labelText: 'Kategori',
+                border: OutlineInputBorder(),
+              ),
+              items: _kategoriList.map((kategori) {
+                return DropdownMenuItem<String>(
+                  value: kategori,
+                  child: Text(kategori),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedKategori = value!;
+                });
+              },
+              validator: (value) => value == 'empty' ? 'Pilih kategori' : null,
             ),
             TextField(
               controller: gambarController,
@@ -81,7 +99,7 @@ class _EditScreenState extends State<EditScreen> {
       id: widget.product.id,
       nama: namaController.text,
       deskripsi: deskripsiController.text,
-      kategori: kategoriController.text,
+      kategori: _selectedKategori,
       gambar: gambarController.text,
       harga: hargaController.text,
     );
